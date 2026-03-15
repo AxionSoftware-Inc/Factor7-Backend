@@ -30,11 +30,15 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-^m!5$ju_6sk_fo1*lo=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
 
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
-    if host.strip()
-]
+def parse_csv_env(name, default):
+    return [
+        value.strip()
+        for value in os.getenv(name, default).split(",")
+        if value.strip()
+    ]
+
+
+ALLOWED_HOSTS = parse_csv_env("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
 
 for internal_host in ("backend", "backend_proxy"):
     if internal_host not in ALLOWED_HOSTS:
@@ -248,24 +252,41 @@ JAZZMIN_UI_TWEAKS = {
 }
 
 # CORS settings
-CORS_ALLOWED_ORIGINS = [
-    "http://62.72.32.37:3000",
-    "https://62.72.32.37:3000",
-    "http://62.72.32.37:3001",
-    "https://62.72.32.37:3001",
-    "http://localhost:5173",
-    "http://localhost:3000",
-]
+CORS_ALLOWED_ORIGINS = parse_csv_env(
+    "DJANGO_CORS_ALLOWED_ORIGINS",
+    ",".join([
+        "http://62.72.32.37:3000",
+        "https://62.72.32.37:3000",
+        "http://62.72.32.37:3001",
+        "https://62.72.32.37:3001",
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+    ]),
+)
 
 # Optional but recommended for DRF + Session Authentication or CSRF protection
-CSRF_TRUSTED_ORIGINS = [
-    "http://62.72.32.37:3000",
-    "https://62.72.32.37:3000",
-    "http://62.72.32.37:3001",
-    "https://62.72.32.37:3001",
-    "http://localhost:5173",
-    "http://localhost:3000",
-]
+CSRF_TRUSTED_ORIGINS = parse_csv_env(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    ",".join([
+        "http://62.72.32.37",
+        "https://62.72.32.37",
+        "http://62.72.32.37:3000",
+        "https://62.72.32.37:3000",
+        "http://62.72.32.37:3001",
+        "https://62.72.32.37:3001",
+        "http://62.72.32.37:8001",
+        "https://62.72.32.37:8001",
+        "http://localhost",
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "http://127.0.0.1:8001",
+    ]),
+)
 
 # To allow all origins (less secure, use only for debugging if needed)
 # CORS_ALLOW_ALL_ORIGINS = True
