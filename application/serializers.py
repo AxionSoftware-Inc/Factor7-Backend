@@ -1,17 +1,12 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Mahsulot, Category, Tag, Article, Book, Course
+from .models import Category, Tag, Tour, Booking, Inquiry
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'first_name', 'last_name', 'is_staff', 'is_superuser', 'is_active', 'date_joined')
         read_only_fields = ('date_joined',)
-
-class MahsulotSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Mahsulot
-        fields = '__all__'
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,26 +18,22 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = '__all__'
 
-class ArticleSerializer(serializers.ModelSerializer):
+class TourSerializer(serializers.ModelSerializer):
     category_name = serializers.ReadOnlyField(source='category.name')
     tags_names = serializers.StringRelatedField(many=True, read_only=True, source='tags')
 
     class Meta:
-        model = Article
+        model = Tour
         fields = '__all__'
 
-class BookSerializer(serializers.ModelSerializer):
-    category_name = serializers.ReadOnlyField(source='category.name')
-    tags_names = serializers.StringRelatedField(many=True, read_only=True, source='tags')
+class BookingSerializer(serializers.ModelSerializer):
+    tour_title = serializers.ReadOnlyField(source='tour.title')
 
     class Meta:
-        model = Book
+        model = Booking
         fields = '__all__'
 
-class CourseSerializer(serializers.ModelSerializer):
-    category_name = serializers.ReadOnlyField(source='category.name')
-    tags_names = serializers.StringRelatedField(many=True, read_only=True, source='tags')
-
+class InquirySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Course
+        model = Inquiry
         fields = '__all__'

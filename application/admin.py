@@ -1,36 +1,35 @@
 from django.contrib import admin
-from .models import Mahsulot, Category, Tag, Article, Book, Course, VisitorLog
+from .models import Category, Tag, Tour, Booking, Inquiry, VisitorLog
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'slug')
     search_fields = ('name',)
+    prepopulated_fields = {'slug': ('name',)}
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
 
-@admin.register(Article)
-class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('title', 'category', 'views', 'is_published', 'created_at')
-    list_filter = ('is_published', 'category', 'created_at')
-    search_fields = ('title', 'content')
+@admin.register(Tour)
+class TourAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'price', 'duration', 'is_published', 'is_featured', 'views')
+    list_filter = ('is_published', 'is_featured', 'category', 'created_at')
+    search_fields = ('title', 'description')
     prepopulated_fields = {'slug': ('title',)}
 
-@admin.register(Book)
-class BookAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'price', 'is_free', 'views', 'downloads', 'is_published')
-    list_filter = ('is_published', 'is_free', 'category', 'language')
-    search_fields = ('title', 'author')
-    prepopulated_fields = {'slug': ('title',)}
+@admin.register(Booking)
+class BookingAdmin(admin.ModelAdmin):
+    list_display = ('full_name', 'tour', 'phone_number', 'booking_date', 'status', 'created_at')
+    list_filter = ('status', 'booking_date', 'created_at')
+    search_fields = ('full_name', 'phone_number', 'tour__title')
 
-@admin.register(Course)
-class CourseAdmin(admin.ModelAdmin):
-    list_display = ('title', 'instructor', 'level_type', 'price', 'is_free', 'views', 'is_published')
-    list_filter = ('is_published', 'is_free', 'level_type', 'category')
-    search_fields = ('title', 'instructor')
-    prepopulated_fields = {'slug': ('title',)}
+@admin.register(Inquiry)
+class InquiryAdmin(admin.ModelAdmin):
+    list_display = ('full_name', 'phone_number', 'is_resolved', 'created_at')
+    list_filter = ('is_resolved', 'created_at')
+    search_fields = ('full_name', 'phone_number', 'message')
 
 @admin.register(VisitorLog)
 class VisitorLogAdmin(admin.ModelAdmin):
@@ -42,8 +41,3 @@ class VisitorLogAdmin(admin.ModelAdmin):
         return False
     def has_change_permission(self, request, obj=None):
         return False
-
-@admin.register(Mahsulot)
-class MahsulotAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price')
-    search_fields = ('name',)

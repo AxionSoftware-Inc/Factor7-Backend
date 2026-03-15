@@ -105,14 +105,21 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'Data'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'root'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('DB_NAME', 'Data'),
+#         'USER': os.getenv('DB_USER', 'postgres'),
+#         'PASSWORD': os.getenv('DB_PASSWORD', 'root'),
+#         'HOST': os.getenv('DB_HOST', 'localhost'),
+#         'PORT': os.getenv('DB_PORT', '5432'),
+#     }
+# }
 
 
 # Password validation
@@ -156,14 +163,14 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 JAZZMIN_SETTINGS = {
-    "site_title": "Quantum UZ Admin",
-    "site_header": "Quantum UZ",
-    "site_brand": "Quantum Dashboard",
+    "site_title": "Tour Factor 7 Admin",
+    "site_header": "Tour Factor 7",
+    "site_brand": "Tour Factor 7",
     "site_logo_classes": "img-circle",
-    "welcome_sign": "Quantum UZ boshqaruv paneliga xush kelibsiz!",
-    "copyright": "Quantum UZ Team © 2026",
+    "welcome_sign": "Tour Factor 7 boshqaruv paneliga xush kelibsiz!",
+    "copyright": "Tour Factor 7 Team © 2026",
     
-    "search_model": ["application.Article", "application.Book", "application.Course"],
+    "search_model": ["application.Tour", "application.Booking"],
     "user_avatar": None,
 
     "topmenu_links": [
@@ -174,21 +181,13 @@ JAZZMIN_SETTINGS = {
     "show_sidebar": True,
     "navigation_expanded": True,
     "hide_apps": [],
-    "hide_models": ["auth.Group", "application.Mahsulot"],
-
-    "custom_links": {
-        "application": [{
-            "name": "Barcha maqolalar", 
-            "url": "application/article/", 
-            "icon": "fas fa-file-alt",
-        }]
-    },
+    "hide_models": ["auth.Group"],
 
     "icons": {
         "auth.User": "fas fa-user",
-        "application.Article": "fas fa-pencil-alt",
-        "application.Book": "fas fa-book",
-        "application.Course": "fas fa-graduation-cap",
+        "application.Tour": "fas fa-plane",
+        "application.Booking": "fas fa-calendar-check",
+        "application.Inquiry": "fas fa-envelope",
         "application.Category": "fas fa-layer-group",
         "application.Tag": "fas fa-tags",
         "application.VisitorLog": "fas fa-chart-line",
@@ -199,9 +198,9 @@ JAZZMIN_SETTINGS = {
     
     "order_with_respect_to": [
         "auth",
-        "application.Article",
-        "application.Course",
-        "application.Book",
+        "application.Tour",
+        "application.Booking",
+        "application.Inquiry",
         "application.Category",
         "application.Tag",
         "application.VisitorLog"
@@ -246,6 +245,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://62.72.32.37:3000",
     "http://62.72.32.37:3001",
     "https://62.72.32.37:3001",
+    "http://localhost:5173",
+    "http://localhost:3000",
 ]
 
 # Optional but recommended for DRF + Session Authentication or CSRF protection
@@ -254,6 +255,8 @@ CSRF_TRUSTED_ORIGINS = [
     "https://62.72.32.37:3000",
     "http://62.72.32.37:3001",
     "https://62.72.32.37:3001",
+    "http://localhost:5173",
+    "http://localhost:3000",
 ]
 
 # To allow all origins (less secure, use only for debugging if needed)

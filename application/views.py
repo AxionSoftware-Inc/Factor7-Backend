@@ -2,7 +2,6 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from datetime import timedelta
@@ -10,10 +9,10 @@ from django.db.models import Count
 from django.db.models.functions import TruncDate
 from .mixins import ViewCountMixin
 
-from .models import Mahsulot, Category, Tag, Article, Book, Course, VisitorLog
+from .models import Category, Tag, Tour, Booking, Inquiry, VisitorLog
 from .serializers import (
-    MahsulotSerializer, CategorySerializer, TagSerializer, 
-    ArticleSerializer, BookSerializer, CourseSerializer
+    CategorySerializer, TagSerializer, TourSerializer, 
+    BookingSerializer, InquirySerializer, UserSerializer
 )
 
 class DashboardStatsAPI(APIView):
@@ -22,9 +21,9 @@ class DashboardStatsAPI(APIView):
         week_ago = today - timedelta(days=6)
         
         stats = {
-            "articles_count": Article.objects.count(),
-            "books_count": Book.objects.count(),
-            "courses_count": Course.objects.count(),
+            "tours_count": Tour.objects.count(),
+            "bookings_count": Booking.objects.count(),
+            "inquiries_count": Inquiry.objects.count(),
             "visitors_today": VisitorLog.objects.filter(timestamp__date=today).count(),
             "visitors_week": VisitorLog.objects.filter(timestamp__date__gte=week_ago).count(),
         }
@@ -52,19 +51,6 @@ class DashboardStatsAPI(APIView):
         
         return Response(stats)
 
-class MahsulotAPI(APIView):
-    def get(self, request):
-        malumot = Mahsulot.objects.all() 
-        serializer = MahsulotSerializer(malumot, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        kop_narsami = isinstance(request.data, list)
-        serializer = MahsulotSerializer(data=request.data, many=kop_narsami)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -73,9 +59,9 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
-class ArticleViewSet(ViewCountMixin, viewsets.ModelViewSet):
-    queryset = Article.objects.select_related("category").prefetch_related("tags").all()
-    serializer_class = ArticleSerializer
+class TourViewSet(ViewCountMixin, viewsets.ModelViewSet):
+    queryset = Tour.objects.select_related("category").prefetch_related("tags").all()
+    serializer_class = TourSerializer
 
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
@@ -89,56 +75,15 @@ class ArticleViewSet(ViewCountMixin, viewsets.ModelViewSet):
 
         return get_object_or_404(queryset, slug=value)
 
-class BookViewSet(ViewCountMixin, viewsets.ModelViewSet):
-    queryset = Book.objects.select_related("category").prefetch_related("tags").all()
-    serializer_class = BookSerializer
+class BookingViewSet(viewsets.ModelViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
 
-    def get_object(self):
-        queryset = self.filter_queryset(self.get_queryset())
-        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
-        value = self.kwargs[lookup_url_kwarg]
-
-        if value.isdigit():
-            obj = queryset.filter(pk=value).first()
-            if obj:
-                return obj
-
-        return get_object_or_404(queryset, slug=value)
-
-    @action(detail=True, methods=['get'])
-    def download_pdf(self, request, pk=None):
-        book = self.get_object()
-        if book.pdf_file:
-            book.downloads += 1
-            book.save()
-            return FileResponse(book.pdf_file.open(), as_attachment=True, filename=book.pdf_file.name.split('/')[-1])
-        return Response({"error": "Full PDF not available for this book."}, status=status.HTTP_404_NOT_FOUND)
-
-    @action(detail=True, methods=['get'])
-    def read_sample(self, request, pk=None):
-        book = self.get_object()
-        if book.sample_pdf_file:
-            return FileResponse(book.sample_pdf_file.open(), as_attachment=False)
-        return Response({"error": "Sample PDF not available."}, status=status.HTTP_404_NOT_FOUND)
-
-class CourseViewSet(ViewCountMixin, viewsets.ModelViewSet):
-    queryset = Course.objects.select_related("category").prefetch_related("tags").all()
-    serializer_class = CourseSerializer
-
-    def get_object(self):
-        queryset = self.filter_queryset(self.get_queryset())
-        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
-        value = self.kwargs[lookup_url_kwarg]
-
-        if value.isdigit():
-            obj = queryset.filter(pk=value).first()
-            if obj:
-                return obj
-
-        return get_object_or_404(queryset, slug=value)
+class InquiryViewSet(viewsets.ModelViewSet):
+    queryset = Inquiry.objects.all()
+    serializer_class = InquirySerializer
 
 from django.contrib.auth.models import User
-from .serializers import UserSerializer
 from rest_framework.permissions import IsAdminUser
 
 class UserViewSet(viewsets.ModelViewSet):
